@@ -25,7 +25,7 @@ export default class DrawerContent extends Component {
     render() {
         return (
             <Container style={{ backgroundColor: '#1C2833' }}>
-                <Header>
+                <Header style={{ marginTop: 25 }}>
                     <Body>
                         <Title>Commodity Price</Title>
                     </Body>

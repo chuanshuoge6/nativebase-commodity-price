@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "native-base",
-    "slug": "native-base",
+    "name": "Commodity",
+    "slug": "nativebase-commodity-price",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [
@@ -25,6 +25,10 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "android": {
+      "package": "com.chuanshuoge.commodity"
+    },
+    "description": ""
   }
 }

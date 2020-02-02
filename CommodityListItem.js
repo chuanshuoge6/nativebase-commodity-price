@@ -26,7 +26,7 @@ export default class CommodityListItem extends Component {
         const data = this.props.data
 
         return (
-            <ListItem icon noBorder style={{ height: 100 }}>
+            <ListItem icon noBorder style={{ height: 120 }}>
                 <Left><CustomIcon name={this.props.iconName} size={50} color="white"></CustomIcon></Left>
                 <Body>
                     <Text style={{ color: 'gold' }}>{this.props.title}</Text>
@@ -46,7 +46,7 @@ export default class CommodityListItem extends Component {
                         High: {data[3]} Low: {data[4]}
                     </Text>
                 </Body>
-                <Right style={{ paddingTop: 50 }}>
+                <Right style={{ paddingTop: 60 }}>
                     <Text style={{ color: 'pink' }}>{this.props.unit} {"\n"}
                         <Text note>Contract: {'\n'} {data[1]} {'\n'} Updated: {"\n"} {data[8]}</Text>
                     </Text>

@@ -79,24 +79,6 @@ export default class App extends Component {
         });
         this.setState({ copper })
 
-        let gold = []
-        tr[4].findAll('td').forEach(element => {
-          gold.push(element.string.toString())
-        });
-        this.setState({ gold })
-
-        let palladium = []
-        tr[6].findAll('td').forEach(element => {
-          palladium.push(element.string.toString())
-        });
-        this.setState({ palladium })
-
-        let platinum = []
-        tr[8].findAll('td').forEach(element => {
-          platinum.push(element.string.toString())
-        });
-        this.setState({ platinum })
-
       })
       .catch(function (error) {
         alert(error);
@@ -104,27 +86,36 @@ export default class App extends Component {
 
     await axios({
       method: 'get',
-      url: 'https://quotes.ino.com/charting/?s=FOREX_XAGUSDO',
+      url: 'https://quotes.ino.com/exchanges/exchange.html?e=FOREX',
     })
       .then(response => {
         const soup = new JSSoup(response.data)
-        const table = soup.findAll('table')
+        const tr = soup.findAll('tr', 'odd')
 
-        let data1 = []
-        table[0].findAll('tr').forEach(tr => {
-          data1.push(tr.find('td').string.toString())
+        let gold = []
+        tr[8].previousElement.parent.parent
+          .findAll('td').forEach(element => {
+            gold.push(element.string.toString())
+          });
+        this.setState({ gold })
+
+        let palladium = []
+        tr[8].findAll('td').forEach(element => {
+          palladium.push(element.string.toString())
         });
+        this.setState({ palladium })
 
-        let data2 = []
-        table[1].findAll('tr').forEach(tr => {
-          data2.push(tr.find('td').string.toString())
+        let platinum = []
+        tr[9].previousElement.parent.parent
+          .findAll('td').forEach(element => {
+            platinum.push(element.string.toString())
+          });
+        this.setState({ platinum })
+
+        let silver = []
+        tr[9].findAll('td').forEach(element => {
+          silver.push(element.string.toString())
         });
-
-        const dif = parseFloat(data1[0]) - parseFloat(data1[1])
-        const percentDif = dif / parseFloat(data1[1])
-        const change = dif >= 0 ? '+' + dif.toString() : '-' + dif.toString()
-        const pct = dif >= 0 ? '+' + percentDif.toString() + '%' : '-' + percentDif.toString() + '%'
-        const silver = ['', data2[3].split(' ')[0], data2[0], data2[1], data1[2], data1[0], change, pct, data2[3].split(' ')[1]]
         this.setState({ silver })
 
       })
@@ -366,7 +357,7 @@ export default class App extends Component {
         onClose={() => this.closeDrawer()} >
 
         <Container style={{ backgroundColor: '#1C2833' }}>
-          <Header>
+          <Header style={{ marginTop: 25 }}>
             <Left>
               <Button transparent onPress={() => this.openDrawer()}>
                 <Icon name='menu' />
@@ -498,7 +489,7 @@ export default class App extends Component {
                   iconName='copper'
                   title='Copper'
                   data={copper}
-                  unit='USD/Ton'
+                  unit='USD/Pound'
                 ></CommodityListItem> :
                 <Spinner />}
 
