@@ -97,12 +97,14 @@ export default class App extends Component {
           .findAll('td').forEach(element => {
             gold.push(element.string.toString())
           });
+        gold[1] = 'Spot'
         this.setState({ gold })
 
         let palladium = []
         tr[8].findAll('td').forEach(element => {
           palladium.push(element.string.toString())
         });
+        palladium[1] = 'Spot'
         this.setState({ palladium })
 
         let platinum = []
@@ -110,12 +112,14 @@ export default class App extends Component {
           .findAll('td').forEach(element => {
             platinum.push(element.string.toString())
           });
+        platinum[1] = 'Spot'
         this.setState({ platinum })
 
         let silver = []
         tr[9].findAll('td').forEach(element => {
           silver.push(element.string.toString())
         });
+        silver[1] = 'Spot'
         this.setState({ silver })
 
       })
