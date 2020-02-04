@@ -32,6 +32,7 @@ export default class App extends Component {
       lean_hog: null,
       live_cattle: null,
       brent_crude: null,
+      crude_oil: null,
       ethanol: null,
       coal: null,
       propane: null,
@@ -65,6 +66,51 @@ export default class App extends Component {
     });
     this.setState({ loadingFont: false })
 
+    this.fetch_data()
+
+    setInterval(() => {
+      this.fetch_data()
+    }, 10000);
+  }
+
+
+  closeDrawer = () => {
+    this.drawer._root.close()
+  };
+
+  openDrawer = () => {
+    this.drawer._root.open()
+  };
+
+  changeCategory = (c) => {
+    this.setState({ category: c })
+  }
+
+  //find the first row of table with the first column containing the symbol
+  //return all columns in the row
+  jssoup_extract = (trs, symbol) => {
+    let tr
+    for (let i = 0; i < trs.length; i++) {
+      try {
+        if (trs[i].find('td').string.toString().includes(symbol)) {
+          tr = trs[i]
+          break
+        }
+      }
+      catch (err) {
+        continue
+      }
+    }
+
+    let data = []
+    tr.findAll('td').forEach(element => {
+      data.push(element.string.toString())
+    });
+
+    return data
+  }
+
+  fetch_data = async () => {
     await axios({
       method: 'get',
       url: 'https://quotes.ino.com/exchanges/category.html?c=metals',
@@ -73,11 +119,7 @@ export default class App extends Component {
         const soup = new JSSoup(response.data)
         const tr = soup.findAll('tr', 'odd')
 
-        let copper = []
-        tr[0].findAll('td').forEach(element => {
-          copper.push(element.string.toString())
-        });
-        this.setState({ copper })
+        this.setState({ copper: this.jssoup_extract(tr, 'HG') })
 
       })
       .catch(function (error) {
@@ -90,35 +132,21 @@ export default class App extends Component {
     })
       .then(response => {
         const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr', 'odd')
+        const tr = soup.findAll('tr')
 
-        let gold = []
-        tr[8].previousElement.parent.parent
-          .findAll('td').forEach(element => {
-            gold.push(element.string.toString())
-          });
+        let gold = this.jssoup_extract(tr, 'XAUUSDO')
         gold[1] = 'Spot'
         this.setState({ gold })
 
-        let palladium = []
-        tr[8].findAll('td').forEach(element => {
-          palladium.push(element.string.toString())
-        });
+        let palladium = this.jssoup_extract(tr, 'XPDUSDO')
         palladium[1] = 'Spot'
         this.setState({ palladium })
 
-        let platinum = []
-        tr[9].previousElement.parent.parent
-          .findAll('td').forEach(element => {
-            platinum.push(element.string.toString())
-          });
+        let platinum = this.jssoup_extract(tr, 'XPTUSDO')
         platinum[1] = 'Spot'
         this.setState({ platinum })
 
-        let silver = []
-        tr[9].findAll('td').forEach(element => {
-          silver.push(element.string.toString())
-        });
+        let silver = this.jssoup_extract(tr, 'XAGUSDO')
         silver[1] = 'Spot'
         this.setState({ silver })
 
@@ -135,41 +163,14 @@ export default class App extends Component {
         const soup = new JSSoup(response.data)
         const tr = soup.findAll('tr', 'odd')
 
-        let corn = []
-        tr[0].findAll('td').forEach(element => {
-          corn.push(element.string.toString())
-        });
-        this.setState({ corn })
-
-        let red_wheat = []
-        tr[2].findAll('td').forEach(element => {
-          red_wheat.push(element.string.toString())
-        });
-        this.setState({ red_wheat })
-
-        let soybean_meal = []
-        tr[6].findAll('td').forEach(element => {
-          soybean_meal.push(element.string.toString())
-        });
-        this.setState({ soybean_meal })
-
-        let soybean_oil = []
-        tr[8].findAll('td').forEach(element => {
-          soybean_oil.push(element.string.toString())
-        });
-        this.setState({ soybean_oil })
-
-        let soybean = []
-        tr[10].findAll('td').forEach(element => {
-          soybean.push(element.string.toString())
-        });
-        this.setState({ soybean })
-
-        let wheat = []
-        tr[12].findAll('td').forEach(element => {
-          wheat.push(element.string.toString())
-        });
-        this.setState({ wheat })
+        this.setState({
+          corn: this.jssoup_extract(tr, 'ZC'),
+          red_wheat: this.jssoup_extract(tr, 'MW'),
+          soybean_meal: this.jssoup_extract(tr, 'ZM'),
+          soybean_oil: this.jssoup_extract(tr, 'ZL'),
+          soybean: this.jssoup_extract(tr, 'ZS'),
+          wheat: this.jssoup_extract(tr, 'ZW')
+        })
 
       })
       .catch(function (error) {
@@ -184,47 +185,16 @@ export default class App extends Component {
         const soup = new JSSoup(response.data)
         const tr = soup.findAll('tr', 'odd')
 
-        let brent_crude = []
-        tr[2].findAll('td').forEach(element => {
-          brent_crude.push(element.string.toString())
-        });
-        this.setState({ brent_crude })
-
-        let ethanol = []
-        tr[8].findAll('td').forEach(element => {
-          ethanol.push(element.string.toString())
-        });
-        this.setState({ ethanol })
-
-        let coal = []
-        tr[10].findAll('td').forEach(element => {
-          coal.push(element.string.toString())
-        });
-        this.setState({ coal })
-
-        let propane = []
-        tr[12].findAll('td').forEach(element => {
-          propane.push(element.string.toString())
-        });
-        this.setState({ propane })
-
-        let fuel_oil = []
-        tr[26].findAll('td').forEach(element => {
-          fuel_oil.push(element.string.toString())
-        });
-        this.setState({ fuel_oil })
-
-        let natural_gas = []
-        tr[80].findAll('td').forEach(element => {
-          natural_gas.push(element.string.toString())
-        });
-        this.setState({ natural_gas })
-
-        let gasoline = []
-        tr[120].findAll('td').forEach(element => {
-          gasoline.push(element.string.toString())
-        });
-        this.setState({ gasoline })
+        this.setState({
+          brent_crude: this.jssoup_extract(tr, 'QBZ'),
+          crude_oil: this.jssoup_extract(tr, 'CL.'),
+          ethanol: this.jssoup_extract(tr, 'QCU'),
+          coal: this.jssoup_extract(tr, 'QMTF'),
+          propane: this.jssoup_extract(tr, 'Q8K'),
+          fuel_oil: this.jssoup_extract(tr, 'MFB'),
+          natural_gas: this.jssoup_extract(tr, 'QNN'),
+          gasoline: this.jssoup_extract(tr, 'QRB.')
+        })
 
       })
       .catch(function (error) {
@@ -239,11 +209,7 @@ export default class App extends Component {
         const soup = new JSSoup(response.data)
         const tr = soup.findAll('tr', 'odd')
 
-        let lumber = []
-        tr[45].findAll('td').forEach(element => {
-          lumber.push(element.string.toString())
-        });
-        this.setState({ lumber })
+        this.setState({ lumber: this.jssoup_extract(tr, 'LBS') })
 
       })
       .catch(function (error) {
@@ -258,35 +224,13 @@ export default class App extends Component {
         const soup = new JSSoup(response.data)
         const tr = soup.findAll('tr', 'odd')
 
-        let cocoa = []
-        tr[0].findAll('td').forEach(element => {
-          cocoa.push(element.string.toString())
-        });
-        this.setState({ cocoa })
-
-        let coffee = []
-        tr[2].findAll('td').forEach(element => {
-          coffee.push(element.string.toString())
-        });
-        this.setState({ coffee })
-
-        let cotton = []
-        tr[4].findAll('td').forEach(element => {
-          cotton.push(element.string.toString())
-        });
-        this.setState({ cotton })
-
-        let orange_juce = []
-        tr[6].findAll('td').forEach(element => {
-          orange_juce.push(element.string.toString())
-        });
-        this.setState({ orange_juce })
-
-        let sugar = []
-        tr[8].findAll('td').forEach(element => {
-          sugar.push(element.string.toString())
-        });
-        this.setState({ sugar })
+        this.setState({
+          cocoa: this.jssoup_extract(tr, 'CC'),
+          coffee: this.jssoup_extract(tr, 'KC'),
+          cotton: this.jssoup_extract(tr, 'CT'),
+          orange_juce: this.jssoup_extract(tr, 'OJ'),
+          sugar: this.jssoup_extract(tr, 'SB')
+        })
 
       })
       .catch(function (error) {
@@ -301,40 +245,16 @@ export default class App extends Component {
         const soup = new JSSoup(response.data)
         const tr = soup.findAll('tr', 'odd')
 
-        let feeder_cattle = []
-        tr[0].findAll('td').forEach(element => {
-          feeder_cattle.push(element.string.toString())
-        });
-        this.setState({ feeder_cattle })
+        this.setState({
+          feeder_cattle: this.jssoup_extract(tr, 'GF'),
+          lean_hog: this.jssoup_extract(tr, 'HE.'),
+          live_cattle: this.jssoup_extract(tr, 'LE')
+        })
 
-        let lean_hog = []
-        tr[2].findAll('td').forEach(element => {
-          lean_hog.push(element.string.toString())
-        });
-        this.setState({ lean_hog })
-
-        let live_cattle = []
-        tr[6].findAll('td').forEach(element => {
-          live_cattle.push(element.string.toString())
-        });
-        this.setState({ live_cattle })
       })
       .catch(function (error) {
         alert(error);
       });
-  }
-
-
-  closeDrawer = () => {
-    this.drawer._root.close()
-  };
-
-  openDrawer = () => {
-    this.drawer._root.open()
-  };
-
-  changeCategory = (c) => {
-    this.setState({ category: c })
   }
 
   render() {
@@ -342,7 +262,7 @@ export default class App extends Component {
       brent_crude, ethanol, coal, propane, fuel_oil, natural_gas, gasoline,
       copper, gold, palladium, platinum, silver, corn, red_wheat, soybean_meal,
       soybean_oil, soybean, wheat, cocoa, coffee, cotton, orange_juce, sugar,
-      lumber,
+      lumber, crude_oil
     } = this.state
 
     if (loadingFont) {
@@ -389,6 +309,15 @@ export default class App extends Component {
                   iconName='brent_crude'
                   title='Brent Crude'
                   data={brent_crude}
+                  unit='USD/Barrel'
+                ></CommodityListItem> :
+                <Spinner />}
+
+              {crude_oil ?
+                <CommodityListItem
+                  iconName='wti_crude'
+                  title='Crude Oil'
+                  data={crude_oil}
                   unit='USD/Barrel'
                 ></CommodityListItem> :
                 <Spinner />}

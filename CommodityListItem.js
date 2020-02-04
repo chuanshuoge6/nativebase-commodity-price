@@ -19,18 +19,32 @@ export default class CommodityListItem extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            old: '',
+            background: '#1C2833'
         };
+    }
+
+    update_field = () => {
+        this.setState({ background: 'rgba(255, 255, 0, 0.3)' })
+        setTimeout(() => {
+            this.setState({ background: '#1C2833' })
+        }, 1000);
     }
 
     render() {
         const data = this.props.data
+        if (this.state.old !== data[5]) {
+            this.update_field()
+            this.setState({ old: data[5] })
+        }
 
         return (
             <ListItem icon noBorder style={{ height: 120 }}>
                 <Left><CustomIcon name={this.props.iconName} size={50} color="white"></CustomIcon></Left>
                 <Body>
                     <Text style={{ color: 'gold' }}>{this.props.title}</Text>
-                    <Text style={{ color: 'white' }}>{data[5]}{' '}
+                    <Text style={{ color: 'white' }}>
+                        <Text style={{color:'white' ,backgroundColor: this.state.background}}>{data[5]}</Text>{' '}
                         {
                             data[6].includes('-') ?
                                 <CustomIcon name='down' size={15} color="red"></CustomIcon> :
@@ -46,9 +60,9 @@ export default class CommodityListItem extends Component {
                         High: {data[3]} Low: {data[4]}
                     </Text>
                 </Body>
-                <Right style={{ paddingTop: 60 }}>
+                <Right style={{ paddingTop: 80 }}>
                     <Text style={{ color: 'pink' }}>{this.props.unit} {"\n"}
-                        <Text note>Contract: {'\n'} {data[1]} {'\n'} Updated: {"\n"} {data[8]}</Text>
+                        <Text note>Contract: {'\n'} {data[1]} {'\n'}</Text>
                     </Text>
                 </Right>
             </ListItem>
