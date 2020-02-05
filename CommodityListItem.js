@@ -44,7 +44,7 @@ export default class CommodityListItem extends Component {
                 <Body>
                     <Text style={{ color: 'gold' }}>{this.props.title}</Text>
                     <Text style={{ color: 'white' }}>
-                        <Text style={{color:'white' ,backgroundColor: this.state.background}}>{data[5]}</Text>{' '}
+                        <Text style={{ color: 'white', backgroundColor: this.state.background }}>{data[5]}</Text>{' '}
                         {
                             data[6].includes('-') ?
                                 <CustomIcon name='down' size={15} color="red"></CustomIcon> :

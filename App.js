@@ -6,6 +6,7 @@ import { Image } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text'
 import DrawerContent from './Drawer'
 import CommodityListItem from './CommodityListItem'
+import ForexListItem from './ForexListItem'
 import {
   Container, Header, Title, Content, Footer,
   FooterTab, Button, Left, Right, Body, Icon, Text,
@@ -27,7 +28,7 @@ export default class App extends Component {
     super(props);
     this.state = {
       loadingFont: true,
-      category: 2,
+      category: 6,
       feeder_cattle: null,
       lean_hog: null,
       live_cattle: null,
@@ -56,6 +57,8 @@ export default class App extends Component {
       orange_juce: null,
       sugar: null,
       lumber: null,
+      usd: 1000,
+      exchanges: [],
     };
   }
 
@@ -84,6 +87,7 @@ export default class App extends Component {
 
   changeCategory = (c) => {
     this.setState({ category: c })
+    this.fetch_data()
   }
 
   //find the first row of table with the first column containing the symbol
@@ -110,151 +114,195 @@ export default class App extends Component {
     return data
   }
 
+  //extract data from rows with first cell having 6 chars and containing 'USD'
+  jssoup_extract_currency = (trs) => {
+    this.setState({ exchanges: [] })
+    let array_3d = []
+
+    for (let i = 0; i < trs.length; i++) {
+      try {
+        const symbol = trs[i].find('td').string.toString()
+        if (symbol.includes('USD') && symbol.length === 6) {
+
+          let data = []
+          trs[i].findAll('td').forEach(element => {
+            data.push(element.string.toString())
+          });
+
+          array_3d.push(data)
+        }
+      }
+      catch (err) {
+        continue
+      }
+
+      this.setState({ exchanges: array_3d })
+    }
+  }
+
   fetch_data = async () => {
-    await axios({
-      method: 'get',
-      url: 'https://quotes.ino.com/exchanges/category.html?c=metals',
-    })
-      .then(response => {
-        const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr', 'odd')
-
-        this.setState({ copper: this.jssoup_extract(tr, 'HG') })
-
-      })
-      .catch(function (error) {
-        alert(error);
-      });
-
-    await axios({
-      method: 'get',
-      url: 'https://quotes.ino.com/exchanges/exchange.html?e=FOREX',
-    })
-      .then(response => {
-        const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr')
-
-        let gold = this.jssoup_extract(tr, 'XAUUSDO')
-        gold[1] = 'Spot'
-        this.setState({ gold })
-
-        let palladium = this.jssoup_extract(tr, 'XPDUSDO')
-        palladium[1] = 'Spot'
-        this.setState({ palladium })
-
-        let platinum = this.jssoup_extract(tr, 'XPTUSDO')
-        platinum[1] = 'Spot'
-        this.setState({ platinum })
-
-        let silver = this.jssoup_extract(tr, 'XAGUSDO')
-        silver[1] = 'Spot'
-        this.setState({ silver })
-
-      })
-      .catch(function (error) {
-        alert(error);
-      });
-
-    await axios({
-      method: 'get',
-      url: 'https://quotes.ino.com/exchanges/category.html?c=grains',
-    })
-      .then(response => {
-        const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr', 'odd')
-
-        this.setState({
-          corn: this.jssoup_extract(tr, 'ZC'),
-          red_wheat: this.jssoup_extract(tr, 'MW'),
-          soybean_meal: this.jssoup_extract(tr, 'ZM'),
-          soybean_oil: this.jssoup_extract(tr, 'ZL'),
-          soybean: this.jssoup_extract(tr, 'ZS'),
-          wheat: this.jssoup_extract(tr, 'ZW')
+    switch (this.state.category) {
+      case 6:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/exchange.html?e=FOREX',
         })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr')
 
-      })
-      .catch(function (error) {
-        alert(error);
-      });
+            this.jssoup_extract_currency(tr)
 
-    await axios({
-      method: 'get',
-      url: 'https://quotes.ino.com/exchanges/category.html?c=energy',
-    })
-      .then(response => {
-        const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr', 'odd')
+            let gold = this.jssoup_extract(tr, 'XAUUSDO')
+            gold[1] = 'Spot'
+            this.setState({ gold })
 
-        this.setState({
-          brent_crude: this.jssoup_extract(tr, 'QBZ'),
-          crude_oil: this.jssoup_extract(tr, 'CL.'),
-          ethanol: this.jssoup_extract(tr, 'QCU'),
-          coal: this.jssoup_extract(tr, 'QMTF'),
-          propane: this.jssoup_extract(tr, 'Q8K'),
-          fuel_oil: this.jssoup_extract(tr, 'MFB'),
-          natural_gas: this.jssoup_extract(tr, 'QNN'),
-          gasoline: this.jssoup_extract(tr, 'QRB.')
+            let palladium = this.jssoup_extract(tr, 'XPDUSDO')
+            palladium[1] = 'Spot'
+            this.setState({ palladium })
+
+            let platinum = this.jssoup_extract(tr, 'XPTUSDO')
+            platinum[1] = 'Spot'
+            this.setState({ platinum })
+
+            let silver = this.jssoup_extract(tr, 'XAGUSDO')
+            silver[1] = 'Spot'
+            this.setState({ silver })
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+        break;
+
+      case 1:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/category.html?c=energy',
         })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr', 'odd')
 
-      })
-      .catch(function (error) {
-        alert(error);
-      });
+            this.setState({
+              brent_crude: this.jssoup_extract(tr, 'QBZ'),
+              crude_oil: this.jssoup_extract(tr, 'CL.'),
+              ethanol: this.jssoup_extract(tr, 'QCU'),
+              coal: this.jssoup_extract(tr, 'QMTF'),
+              propane: this.jssoup_extract(tr, 'Q8K'),
+              fuel_oil: this.jssoup_extract(tr, 'MFB'),
+              natural_gas: this.jssoup_extract(tr, 'QNN'),
+              gasoline: this.jssoup_extract(tr, 'QRB.')
+            })
 
-    await axios({
-      method: 'get',
-      url: 'https://quotes.ino.com/exchanges/exchange.html?e=CME',
-    })
-      .then(response => {
-        const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr', 'odd')
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+        break
 
-        this.setState({ lumber: this.jssoup_extract(tr, 'LBS') })
-
-      })
-      .catch(function (error) {
-        alert(error);
-      });
-
-    await axios({
-      method: 'get',
-      url: 'https://quotes.ino.com/exchanges/category.html?c=food',
-    })
-      .then(response => {
-        const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr', 'odd')
-
-        this.setState({
-          cocoa: this.jssoup_extract(tr, 'CC'),
-          coffee: this.jssoup_extract(tr, 'KC'),
-          cotton: this.jssoup_extract(tr, 'CT'),
-          orange_juce: this.jssoup_extract(tr, 'OJ'),
-          sugar: this.jssoup_extract(tr, 'SB')
+      case 2:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/category.html?c=metals',
         })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr', 'odd')
 
-      })
-      .catch(function (error) {
-        alert(error);
-      });
+            this.setState({ copper: this.jssoup_extract(tr, 'HG') })
 
-    await axios({
-      method: 'get',
-      url: 'https://quotes.ino.com/exchanges/category.html?c=livestock',
-    })
-      .then(response => {
-        const soup = new JSSoup(response.data)
-        const tr = soup.findAll('tr', 'odd')
+          })
+          .catch(function (error) {
+            alert(error);
+          });
 
-        this.setState({
-          feeder_cattle: this.jssoup_extract(tr, 'GF'),
-          lean_hog: this.jssoup_extract(tr, 'HE.'),
-          live_cattle: this.jssoup_extract(tr, 'LE')
+        break
+
+      case 3:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/category.html?c=grains',
         })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr', 'odd')
 
-      })
-      .catch(function (error) {
-        alert(error);
-      });
+            this.setState({
+              corn: this.jssoup_extract(tr, 'ZC'),
+              red_wheat: this.jssoup_extract(tr, 'MW'),
+              soybean_meal: this.jssoup_extract(tr, 'ZM'),
+              soybean_oil: this.jssoup_extract(tr, 'ZL'),
+              soybean: this.jssoup_extract(tr, 'ZS'),
+              wheat: this.jssoup_extract(tr, 'ZW')
+            })
+
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+        break
+      case 4:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/exchange.html?e=CME',
+        })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr', 'odd')
+
+            this.setState({ lumber: this.jssoup_extract(tr, 'LBS') })
+
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/category.html?c=food',
+        })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr', 'odd')
+
+            this.setState({
+              cocoa: this.jssoup_extract(tr, 'CC'),
+              coffee: this.jssoup_extract(tr, 'KC'),
+              cotton: this.jssoup_extract(tr, 'CT'),
+              orange_juce: this.jssoup_extract(tr, 'OJ'),
+              sugar: this.jssoup_extract(tr, 'SB')
+            })
+
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+        break
+
+      case 5:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/category.html?c=livestock',
+        })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr', 'odd')
+
+            this.setState({
+              feeder_cattle: this.jssoup_extract(tr, 'GF'),
+              lean_hog: this.jssoup_extract(tr, 'HE.'),
+              live_cattle: this.jssoup_extract(tr, 'LE')
+            })
+
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+        break
+
+      default:
+        break;
+    }
   }
 
   render() {
@@ -262,7 +310,7 @@ export default class App extends Component {
       brent_crude, ethanol, coal, propane, fuel_oil, natural_gas, gasoline,
       copper, gold, palladium, platinum, silver, corn, red_wheat, soybean_meal,
       soybean_oil, soybean, wheat, cocoa, coffee, cotton, orange_juce, sugar,
-      lumber, crude_oil
+      lumber, crude_oil, exchanges,
     } = this.state
 
     if (loadingFont) {
@@ -295,7 +343,8 @@ export default class App extends Component {
                       category === 3 ? 'Grains' :
                         category === 4 ? 'Softs' :
                           category === 5 ? 'Livestock' :
-                            'drawer'
+                            category === 6 ? 'Forex' :
+                              'drawer'
                 }
               </Title>
             </Body>
@@ -578,10 +627,21 @@ export default class App extends Component {
             </Content> :
             null}
 
+          {category === 6 ?
+            exchanges.length > 0 ?
+              <Content>
+                {exchanges.map((item) => {
+                  return <ForexListItem data={item} key={item[0]}></ForexListItem>
+                })} 
+
+              </Content>
+              : <Spinner />
+            : null
+          }
+
         </Container>
       </Drawer>
 
     );
   }
 }
-

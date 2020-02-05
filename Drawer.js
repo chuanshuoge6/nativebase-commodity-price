@@ -36,6 +36,14 @@ export default class DrawerContent extends Component {
                     </Right>
                 </Header>
                 <Content>
+                    <ListItem icon noBorder onPress={() => { this.props.changeCategory(6); this.props.closeDrawer() }}>
+                        <Left>
+                            <CustomIcon name='forex' size={24} color="white"></CustomIcon>
+                        </Left>
+                        <Body>
+                            <Text style={{ color: 'white' }}>Forex</Text>
+                        </Body>
+                    </ListItem>
                     <ListItem icon noBorder onPress={() => { this.props.changeCategory(1); this.props.closeDrawer() }}>
                         <Left>
                             <Icon type='FontAwesome5' name="fire" style={{ color: 'white' }} />
