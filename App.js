@@ -4,6 +4,7 @@ import axios from 'axios'
 import * as Font from 'expo-font'
 import { Image } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text'
+import { Col, Row, Grid } from "react-native-easy-grid";
 import DrawerContent from './Drawer'
 import CommodityListItem from './CommodityListItem'
 import ForexListItem from './ForexListItem'
@@ -310,7 +311,7 @@ export default class App extends Component {
       brent_crude, ethanol, coal, propane, fuel_oil, natural_gas, gasoline,
       copper, gold, palladium, platinum, silver, corn, red_wheat, soybean_meal,
       soybean_oil, soybean, wheat, cocoa, coffee, cotton, orange_juce, sugar,
-      lumber, crude_oil, exchanges,
+      lumber, crude_oil, exchanges, usd
     } = this.state
 
     if (loadingFont) {
@@ -630,10 +631,22 @@ export default class App extends Component {
           {category === 6 ?
             exchanges.length > 0 ?
               <Content>
-                {exchanges.map((item) => {
-                  return <ForexListItem data={item} key={item[0]}></ForexListItem>
-                })} 
-
+                <Grid>
+                  <Col>
+                    {exchanges.map((item, index) => {
+                      if (index % 2 === 0) {
+                        return <Row key={item[0]}><ForexListItem data={item} usd={usd}></ForexListItem></Row>
+                      }
+                    })}
+                  </Col>
+                  <Col>
+                    {exchanges.map((item, index) => {
+                      if (index % 2 === 1) {
+                        return <Row key={item[0]}><ForexListItem data={item} usd={usd} ></ForexListItem></Row>
+                      }
+                    })}
+                  </Col>
+                </Grid>
               </Content>
               : <Spinner />
             : null

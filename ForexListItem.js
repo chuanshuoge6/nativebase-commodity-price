@@ -20,7 +20,7 @@ export default class ForexListItem extends Component {
         super(props);
         this.state = {
             old: '',
-            background: '#1C2833'
+            background: '#1C2833',
         };
     }
 
@@ -32,14 +32,24 @@ export default class ForexListItem extends Component {
     }
 
     render() {
-        const data = this.props.data
-
+        const { data, usd } = this.props
+        let reciprocal = false
+        const currency = data[0].split('USD')
+        if (currency[1] === '') { reciprocal = true }
 
         return (
-            <Text>
-                <Text style={{ color: 'gold' }}>{data[1].replace(/&nbsp;/g, ' ')}</Text>
-                <Text style={{ color: 'white' }}>{data[5]}</Text>
-            </Text>
+            <Button transparent vertical>
+                <Text style={reciprocal ? { color: 'green' } : { color: 'gold' }}>
+                    {data[1].replace(/&nbsp;/g, ' ')}
+                </Text>
+                <Text style={{ color: 'white' }}>{
+                    reciprocal ?
+                        (usd / parseFloat(data[5])).toFixed(2).toString() :
+                        (usd * parseFloat(data[5])).toFixed(2).toString()
+                }{' '}
+                    <Text style={{ color: 'gold' }}>{currency[0]}{currency[1]}</Text>
+                </Text>
+            </Button>
         )
     }
 }
