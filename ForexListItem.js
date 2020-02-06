@@ -24,30 +24,24 @@ export default class ForexListItem extends Component {
         };
     }
 
-    update_field = () => {
-        this.setState({ background: 'rgba(255, 255, 0, 0.3)' })
-        setTimeout(() => {
-            this.setState({ background: '#1C2833' })
-        }, 1000);
-    }
-
     render() {
         const { data, usd } = this.props
         let reciprocal = false
-        const currency = data[0].split('USD')
+        const currency = data[0] === 'USDUSD' ? ['USD', ''] : data[0].split('USD')
         if (currency[1] === '') { reciprocal = true }
 
         return (
-            <Button transparent vertical>
-                <Text style={reciprocal ? { color: 'green' } : { color: 'gold' }}>
+            <Button vertical style={{ flex: 1, margin: 2, backgroundColor: 'rgba(0, 255, 0, 0.1)' }}>
+                <Text numberOfLines={1}
+                    style={{ color: 'gold', fontSize: 12 }}>
                     {data[1].replace(/&nbsp;/g, ' ')}
                 </Text>
-                <Text style={{ color: 'white' }}>{
+                <Text numberOfLines={1} style={{ color: 'white', fontSize: 12 }}>{
                     reciprocal ?
                         (usd / parseFloat(data[5])).toFixed(2).toString() :
                         (usd * parseFloat(data[5])).toFixed(2).toString()
                 }{' '}
-                    <Text style={{ color: 'gold' }}>{currency[0]}{currency[1]}</Text>
+                    <Text style={{ color: 'gold', fontSize: 12 }}>{currency[0]}{currency[1]}</Text>
                 </Text>
             </Button>
         )

@@ -58,8 +58,36 @@ export default class App extends Component {
       orange_juce: null,
       sugar: null,
       lumber: null,
-      usd: 1000,
-      exchanges: [],
+      usd_amount: 1000,
+      usd: ['USDUSD', 'American Dollar', '', '', '', '1'],
+      cny: null,
+      cad: null,
+      eur: null,
+      jpy: null,
+      aud: null,
+      gbp: null,
+      nzd: null,
+      chf: null,
+      hkd: null,
+      inr: null,
+      idr: null,
+      myr: null,
+      php: null,
+      sgd: null,
+      krw: null,
+      thb: null,
+      czk: null,
+      dkk: null,
+      huf: null,
+      nok: null,
+      pln: null,
+      rub: null,
+      sek: null,
+      brl: null,
+      egp: null,
+      ils: null,
+      mxn: null,
+      zar: null,
     };
   }
 
@@ -107,7 +135,7 @@ export default class App extends Component {
       }
     }
 
-    let data = []
+    const data = []
     tr.findAll('td').forEach(element => {
       data.push(element.string.toString())
     });
@@ -115,35 +143,26 @@ export default class App extends Component {
     return data
   }
 
-  //extract data from rows with first cell having 6 chars and containing 'USD'
-  jssoup_extract_currency = (trs) => {
-    this.setState({ exchanges: [] })
-    let array_3d = []
-
-    for (let i = 0; i < trs.length; i++) {
-      try {
-        const symbol = trs[i].find('td').string.toString()
-        if (symbol.includes('USD') && symbol.length === 6) {
-
-          let data = []
-          trs[i].findAll('td').forEach(element => {
-            data.push(element.string.toString())
-          });
-
-          array_3d.push(data)
-        }
-      }
-      catch (err) {
-        continue
-      }
-
-      this.setState({ exchanges: array_3d })
-    }
-  }
-
   fetch_data = async () => {
     switch (this.state.category) {
       case 6:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/charting/?s=FOREX_USDCNY',
+        })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const rate = soup.find('p', 'quote-price').string.toString()
+
+            this.setState({
+              cny: ['USDCNY', 'CHINESE YUan', '', '', '', rate]
+            })
+
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+
         await axios({
           method: 'get',
           url: 'https://quotes.ino.com/exchanges/exchange.html?e=FOREX',
@@ -152,23 +171,37 @@ export default class App extends Component {
             const soup = new JSSoup(response.data)
             const tr = soup.findAll('tr')
 
-            this.jssoup_extract_currency(tr)
+            this.setState({
+              aud: this.jssoup_extract(tr, 'AUDUSD'),
+              gbp: this.jssoup_extract(tr, 'GBPUSD'),
+              cad: this.jssoup_extract(tr, 'USDCAD'),
+              eur: this.jssoup_extract(tr, 'EURUSD'),
+              jpy: this.jssoup_extract(tr, 'USDJPY'),
+              nzd: this.jssoup_extract(tr, 'NZDUSD'),
+              chf: this.jssoup_extract(tr, 'USDCHF'),
+              hkd: this.jssoup_extract(tr, 'USDHKD'),
+              inr: this.jssoup_extract(tr, 'USDINR'),
+              idr: this.jssoup_extract(tr, 'USDIDR'),
+              myr: this.jssoup_extract(tr, 'USDMYR'),
+              php: this.jssoup_extract(tr, 'USDPHP'),
+              sgd: this.jssoup_extract(tr, 'USDSGD'),
+              krw: this.jssoup_extract(tr, 'USDKRW'),
+              thb: this.jssoup_extract(tr, 'USDTHB'),
+              czk: this.jssoup_extract(tr, 'USDCZK'),
+              dkk: this.jssoup_extract(tr, 'USDDKK'),
+              huf: this.jssoup_extract(tr, 'USDHUF'),
+              nok: this.jssoup_extract(tr, 'USDNOK'),
+              pln: this.jssoup_extract(tr, 'USDPLN'),
+              rub: this.jssoup_extract(tr, 'USDRUB'),
+              sek: this.jssoup_extract(tr, 'USDSEK'),
+              brl: this.jssoup_extract(tr, 'USDBRL'),
+              egp: this.jssoup_extract(tr, 'USDEGP'),
+              ils: this.jssoup_extract(tr, 'USDILS'),
+              mxn: this.jssoup_extract(tr, 'USDMXN'),
+              zar: this.jssoup_extract(tr, 'USDZAR'),
+              tnd: this.jssoup_extract(tr, 'USDTND'),
+            })
 
-            let gold = this.jssoup_extract(tr, 'XAUUSDO')
-            gold[1] = 'Spot'
-            this.setState({ gold })
-
-            let palladium = this.jssoup_extract(tr, 'XPDUSDO')
-            palladium[1] = 'Spot'
-            this.setState({ palladium })
-
-            let platinum = this.jssoup_extract(tr, 'XPTUSDO')
-            platinum[1] = 'Spot'
-            this.setState({ platinum })
-
-            let silver = this.jssoup_extract(tr, 'XAGUSDO')
-            silver[1] = 'Spot'
-            this.setState({ silver })
           })
           .catch(function (error) {
             alert(error);
@@ -202,6 +235,35 @@ export default class App extends Component {
         break
 
       case 2:
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/exchanges/exchange.html?e=FOREX',
+        })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const tr = soup.findAll('tr')
+
+            let gold = this.jssoup_extract(tr, 'XAUUSDO')
+            gold[1] = 'Spot'
+            this.setState({ gold })
+
+            let palladium = this.jssoup_extract(tr, 'XPDUSDO')
+            palladium[1] = 'Spot'
+            this.setState({ palladium })
+
+            let platinum = this.jssoup_extract(tr, 'XPTUSDO')
+            platinum[1] = 'Spot'
+            this.setState({ platinum })
+
+            let silver = this.jssoup_extract(tr, 'XAGUSDO')
+            silver[1] = 'Spot'
+            this.setState({ silver })
+
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+
         await axios({
           method: 'get',
           url: 'https://quotes.ino.com/exchanges/category.html?c=metals',
@@ -311,7 +373,9 @@ export default class App extends Component {
       brent_crude, ethanol, coal, propane, fuel_oil, natural_gas, gasoline,
       copper, gold, palladium, platinum, silver, corn, red_wheat, soybean_meal,
       soybean_oil, soybean, wheat, cocoa, coffee, cotton, orange_juce, sugar,
-      lumber, crude_oil, exchanges, usd
+      lumber, crude_oil, usd, aud, gbp, cad, eur, jpy, nzd, chf,
+      hkd, inr, idr, myr, php, sgd, krw, thb, czk, dkk, huf, nok, pln, rub,
+      sek, brl, egp, ils, mxn, zar, tnd, usd_amount, cny,
     } = this.state
 
     if (loadingFont) {
@@ -629,26 +693,163 @@ export default class App extends Component {
             null}
 
           {category === 6 ?
-            exchanges.length > 0 ?
-              <Content>
-                <Grid>
-                  <Col>
-                    {exchanges.map((item, index) => {
-                      if (index % 2 === 0) {
-                        return <Row key={item[0]}><ForexListItem data={item} usd={usd}></ForexListItem></Row>
-                      }
-                    })}
-                  </Col>
-                  <Col>
-                    {exchanges.map((item, index) => {
-                      if (index % 2 === 1) {
-                        return <Row key={item[0]}><ForexListItem data={item} usd={usd} ></ForexListItem></Row>
-                      }
-                    })}
-                  </Col>
-                </Grid>
-              </Content>
-              : <Spinner />
+
+            <Content>
+              <Grid>
+                <Col style={{ alignItems: 'center' }}>
+                  <Row style={{ height: 60 }}>
+                    {usd ?
+                      <ForexListItem data={usd} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {cad ?
+                      <ForexListItem data={cad} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {nzd ?
+                      <ForexListItem data={nzd} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {inr ?
+                      <ForexListItem data={inr} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {php ?
+                      <ForexListItem data={php} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {thb ?
+                      <ForexListItem data={thb} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {huf ?
+                      <ForexListItem data={huf} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {rub ?
+                      <ForexListItem data={rub} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {egp ?
+                      <ForexListItem data={egp} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {zar ?
+                      <ForexListItem data={zar} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                </Col>
+                <Col style={{ alignItems: 'center' }}>
+                  <Row style={{ height: 60 }} >
+                    {cny ?
+                      <ForexListItem data={cny} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {aud ?
+                      <ForexListItem data={aud} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {eur ?
+                      <ForexListItem data={eur} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {chf ?
+                      <ForexListItem data={chf} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {idr ?
+                      <ForexListItem data={idr} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {sgd ?
+                      <ForexListItem data={sgd} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {czk ?
+                      <ForexListItem data={czk} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {nok ?
+                      <ForexListItem data={nok} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {sek ?
+                      <ForexListItem data={sek} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {ils ?
+                      <ForexListItem data={ils} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                </Col>
+                <Col style={{ alignItems: 'center' }}>
+                  <Row style={{ height: 60 }} >
+                    {gbp ?
+                      <ForexListItem data={gbp} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {jpy ?
+                      <ForexListItem data={jpy} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {hkd ?
+                      <ForexListItem data={hkd} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {myr ?
+                      <ForexListItem data={myr} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {krw ?
+                      <ForexListItem data={krw} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {dkk ?
+                      <ForexListItem data={dkk} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {pln ?
+                      <ForexListItem data={pln} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {brl ?
+                      <ForexListItem data={brl} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
+                    {mxn ?
+                      <ForexListItem data={mxn} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                </Col>
+              </Grid>
+            </Content>
+
             : null
           }
 
