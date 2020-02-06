@@ -19,19 +19,18 @@ export default class ForexListItem extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            old: '',
-            background: '#1C2833',
         };
     }
 
     render() {
-        const { data, usd } = this.props
+        const { data, usd, buttonPress } = this.props
         let reciprocal = false
         const currency = data[0] === 'USDUSD' ? ['USD', ''] : data[0].split('USD')
         if (currency[1] === '') { reciprocal = true }
 
         return (
-            <Button vertical style={{ flex: 1, margin: 2, backgroundColor: 'rgba(0, 255, 0, 0.1)' }}>
+            <Button vertical style={{ flex: 1, margin: 2, backgroundColor: 'rgba(0, 255, 0, 0.1)' }}
+                onPress={buttonPress}>
                 <Text numberOfLines={1}
                     style={{ color: 'gold', fontSize: 12 }}>
                     {data[1].replace(/&nbsp;/g, ' ')}

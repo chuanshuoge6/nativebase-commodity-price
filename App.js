@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import JSSoup from 'jssoup'
 import axios from 'axios'
 import * as Font from 'expo-font'
-import { Image } from 'react-native';
+import { Modal, TextInput } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text'
 import { Col, Row, Grid } from "react-native-easy-grid";
 import DrawerContent from './Drawer'
@@ -64,6 +64,7 @@ export default class App extends Component {
       cad: null,
       eur: null,
       jpy: null,
+      btc: null,
       aud: null,
       gbp: null,
       nzd: null,
@@ -88,6 +89,8 @@ export default class App extends Component {
       ils: null,
       mxn: null,
       zar: null,
+      show_modal: false,
+      input_amount: 1000,
     };
   }
 
@@ -152,7 +155,7 @@ export default class App extends Component {
         })
           .then(response => {
             const soup = new JSSoup(response.data)
-            const rate = soup.find('p', 'quote-price').string.toString()
+            const rate = soup.find('p', 'quote-price').nextElement.toString()
 
             this.setState({
               cny: ['USDCNY', 'CHINESE YUan', '', '', '', rate]
@@ -200,6 +203,23 @@ export default class App extends Component {
               mxn: this.jssoup_extract(tr, 'USDMXN'),
               zar: this.jssoup_extract(tr, 'USDZAR'),
               tnd: this.jssoup_extract(tr, 'USDTND'),
+            })
+
+          })
+          .catch(function (error) {
+            alert(error);
+          });
+
+        await axios({
+          method: 'get',
+          url: 'https://quotes.ino.com/charting/?s=FOREX_USDBTC',
+        })
+          .then(response => {
+            const soup = new JSSoup(response.data)
+            const rate = soup.find('p', 'quote-price').nextElement.toString()
+
+            this.setState({
+              btc: ['BTCUSD', 'BIT COIN', '', '', '', rate]
             })
 
           })
@@ -368,6 +388,14 @@ export default class App extends Component {
     }
   }
 
+  forex_button_press = () => {
+    this.setState({ show_modal: true })
+  }
+
+  input_amount_change = (e) => {
+    alert(e.target.value)
+  }
+
   render() {
     const { loadingFont, category, feeder_cattle, lean_hog, live_cattle,
       brent_crude, ethanol, coal, propane, fuel_oil, natural_gas, gasoline,
@@ -375,7 +403,8 @@ export default class App extends Component {
       soybean_oil, soybean, wheat, cocoa, coffee, cotton, orange_juce, sugar,
       lumber, crude_oil, usd, aud, gbp, cad, eur, jpy, nzd, chf,
       hkd, inr, idr, myr, php, sgd, krw, thb, czk, dkk, huf, nok, pln, rub,
-      sek, brl, egp, ils, mxn, zar, tnd, usd_amount, cny,
+      sek, brl, egp, ils, mxn, zar, tnd, usd_amount, cny, btc, show_modal,
+      input_amount,
     } = this.state
 
     if (loadingFont) {
@@ -392,6 +421,32 @@ export default class App extends Component {
           </DrawerContent>
         }
         onClose={() => this.closeDrawer()} >
+
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={show_modal}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+          }}
+        >
+          <Content>
+
+            <Item style={{ backgroundColor: 'white' }}>
+              <Input style={{ height: 100, fontSize: 30 }}
+                keyboardType="number-pad" onChangeText={e => alert(e)} />
+              <Text style={{ fontSize: 30 }}>CAD</Text>
+              <Button large transparent>
+                <Icon active name='swap' style={{ fontSize: 50 }} />
+              </Button>
+              <Button large transparent onPress={() => this.setState({ show_modal: false })}>
+                <Icon active name='close' style={{ fontSize: 50 }} />
+              </Button>
+            </Item>
+          </Content>
+        </Modal>
+
 
         <Container style={{ backgroundColor: '#1C2833' }}>
           <Header style={{ marginTop: 25 }}>
@@ -708,8 +763,8 @@ export default class App extends Component {
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
-                    {nzd ?
-                      <ForexListItem data={nzd} usd={usd_amount}></ForexListItem> : <Spinner />
+                    {gbp ?
+                      <ForexListItem data={gbp} usd={usd_amount}></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
@@ -755,13 +810,18 @@ export default class App extends Component {
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
+                    {btc ?
+                      <ForexListItem data={btc} usd={usd_amount}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
+                  <Row style={{ height: 60 }} >
                     {aud ?
                       <ForexListItem data={aud} usd={usd_amount}></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
-                    {eur ?
-                      <ForexListItem data={eur} usd={usd_amount}></ForexListItem> : <Spinner />
+                    {nzd ?
+                      <ForexListItem data={nzd} usd={usd_amount}></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
@@ -794,16 +854,11 @@ export default class App extends Component {
                       <ForexListItem data={sek} usd={usd_amount}></ForexListItem> : <Spinner />
                     }
                   </Row>
-                  <Row style={{ height: 60 }} >
-                    {ils ?
-                      <ForexListItem data={ils} usd={usd_amount}></ForexListItem> : <Spinner />
-                    }
-                  </Row>
                 </Col>
                 <Col style={{ alignItems: 'center' }}>
                   <Row style={{ height: 60 }} >
-                    {gbp ?
-                      <ForexListItem data={gbp} usd={usd_amount}></ForexListItem> : <Spinner />
+                    {eur ?
+                      <ForexListItem data={eur} usd={usd_amount}></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
@@ -846,12 +901,19 @@ export default class App extends Component {
                       <ForexListItem data={mxn} usd={usd_amount}></ForexListItem> : <Spinner />
                     }
                   </Row>
+                  <Row style={{ height: 60 }} >
+                    {ils ?
+                      <ForexListItem data={ils} usd={usd_amount}
+                        buttonPress={() => this.forex_button_press()}></ForexListItem> : <Spinner />
+                    }
+                  </Row>
                 </Col>
               </Grid>
             </Content>
 
             : null
           }
+
 
         </Container>
       </Drawer>
