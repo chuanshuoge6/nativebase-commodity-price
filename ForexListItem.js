@@ -26,19 +26,20 @@ export default class ForexListItem extends Component {
         const { data, usd, buttonPress } = this.props
         let reciprocal = false
         const currency = data[0] === 'USDUSD' ? ['USD', ''] : data[0].split('USD')
+
         if (currency[1] === '') { reciprocal = true }
+        const rate = reciprocal ? 1 / parseFloat(data[5]) : parseFloat(data[5])
+        const currency_value = (usd * rate).toFixed(2).toString()
 
         return (
             <Button vertical style={{ flex: 1, margin: 2, backgroundColor: 'rgba(0, 255, 0, 0.1)' }}
-                onPress={buttonPress}>
+                onPress={() => buttonPress(currency_value, currency[0] + currency[1], rate)}>
                 <Text numberOfLines={1}
                     style={{ color: 'gold', fontSize: 12 }}>
                     {data[1].replace(/&nbsp;/g, ' ')}
                 </Text>
                 <Text numberOfLines={1} style={{ color: 'white', fontSize: 12 }}>{
-                    reciprocal ?
-                        (usd / parseFloat(data[5])).toFixed(2).toString() :
-                        (usd * parseFloat(data[5])).toFixed(2).toString()
+                    currency_value
                 }{' '}
                     <Text style={{ color: 'gold', fontSize: 12 }}>{currency[0]}{currency[1]}</Text>
                 </Text>

@@ -90,7 +90,9 @@ export default class App extends Component {
       mxn: null,
       zar: null,
       show_modal: false,
-      input_amount: 1000,
+      input_amount: '1000',
+      input_currency: '',
+      input_rate: 1,
     };
   }
 
@@ -388,12 +390,20 @@ export default class App extends Component {
     }
   }
 
-  forex_button_press = () => {
-    this.setState({ show_modal: true })
+  forex_button_press = (value, currency, rate) => {
+    this.setState({
+      show_modal: true,
+      input_amount: value,
+      input_currency: currency,
+      input_rate: rate,
+    })
   }
 
-  input_amount_change = (e) => {
-    alert(e.target.value)
+  exchange_button_press = () => {
+    this.setState({
+      show_modal: false,
+      usd_amount: parseFloat(this.state.input_amount) / this.state.input_rate,
+    })
   }
 
   render() {
@@ -404,7 +414,7 @@ export default class App extends Component {
       lumber, crude_oil, usd, aud, gbp, cad, eur, jpy, nzd, chf,
       hkd, inr, idr, myr, php, sgd, krw, thb, czk, dkk, huf, nok, pln, rub,
       sek, brl, egp, ils, mxn, zar, tnd, usd_amount, cny, btc, show_modal,
-      input_amount,
+      input_amount, input_currency,
     } = this.state
 
     if (loadingFont) {
@@ -427,17 +437,18 @@ export default class App extends Component {
           animationType="slide"
           transparent={true}
           visible={show_modal}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-          }}
         >
           <Content>
 
             <Item style={{ backgroundColor: 'white' }}>
-              <Input style={{ height: 100, fontSize: 30 }}
-                keyboardType="number-pad" onChangeText={e => alert(e)} />
-              <Text style={{ fontSize: 30 }}>CAD</Text>
-              <Button large transparent>
+              <Input
+                style={{ height: 100, fontSize: 30 }}
+                keyboardType="number-pad"
+                value={input_amount}
+                onChangeText={e => this.setState({ input_amount: e ? e.match(/^([0-9]+(\.[0-9]+)?)/g)[0] : '1' })}
+                onSubmitEditing={() => this.exchange_button_press()} />
+              <Text style={{ fontSize: 30 }}>{input_currency}</Text>
+              <Button large transparent onPress={() => this.exchange_button_press()}>
                 <Icon active name='swap' style={{ fontSize: 50 }} />
               </Button>
               <Button large transparent onPress={() => this.setState({ show_modal: false })}>
@@ -754,157 +765,216 @@ export default class App extends Component {
                 <Col style={{ alignItems: 'center' }}>
                   <Row style={{ height: 60 }}>
                     {usd ?
-                      <ForexListItem data={usd} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={usd} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {cad ?
-                      <ForexListItem data={cad} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={cad} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {gbp ?
-                      <ForexListItem data={gbp} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={gbp} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {inr ?
-                      <ForexListItem data={inr} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={inr} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {php ?
-                      <ForexListItem data={php} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={php} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {thb ?
-                      <ForexListItem data={thb} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={thb} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {huf ?
-                      <ForexListItem data={huf} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={huf} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {rub ?
-                      <ForexListItem data={rub} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={rub} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {egp ?
-                      <ForexListItem data={egp} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={egp} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {zar ?
-                      <ForexListItem data={zar} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={zar} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                 </Col>
                 <Col style={{ alignItems: 'center' }}>
                   <Row style={{ height: 60 }} >
                     {cny ?
-                      <ForexListItem data={cny} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={cny} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {btc ?
-                      <ForexListItem data={btc} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={btc} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {aud ?
-                      <ForexListItem data={aud} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={aud} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {nzd ?
-                      <ForexListItem data={nzd} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={nzd} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {chf ?
-                      <ForexListItem data={chf} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={chf} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {idr ?
-                      <ForexListItem data={idr} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={idr} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {sgd ?
-                      <ForexListItem data={sgd} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={sgd} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {czk ?
-                      <ForexListItem data={czk} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={czk} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {nok ?
-                      <ForexListItem data={nok} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={nok} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {sek ?
-                      <ForexListItem data={sek} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={sek} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                 </Col>
                 <Col style={{ alignItems: 'center' }}>
                   <Row style={{ height: 60 }} >
                     {eur ?
-                      <ForexListItem data={eur} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={eur} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {jpy ?
-                      <ForexListItem data={jpy} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={jpy} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {hkd ?
-                      <ForexListItem data={hkd} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={hkd} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {myr ?
-                      <ForexListItem data={myr} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={myr} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {krw ?
-                      <ForexListItem data={krw} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={krw} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {dkk ?
-                      <ForexListItem data={dkk} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={dkk} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {pln ?
-                      <ForexListItem data={pln} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={pln} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {brl ?
-                      <ForexListItem data={brl} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={brl} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {mxn ?
-                      <ForexListItem data={mxn} usd={usd_amount}></ForexListItem> : <Spinner />
+                      <ForexListItem data={mxn} usd={usd_amount}
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}
+                      ></ForexListItem> : <Spinner />
                     }
                   </Row>
                   <Row style={{ height: 60 }} >
                     {ils ?
                       <ForexListItem data={ils} usd={usd_amount}
-                        buttonPress={() => this.forex_button_press()}></ForexListItem> : <Spinner />
+                        buttonPress={(value, currency, rate) => this.forex_button_press(value, currency, rate)}>
+                      </ForexListItem> : <Spinner />
                     }
                   </Row>
                 </Col>
