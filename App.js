@@ -119,8 +119,8 @@ export default class App extends Component {
     this.drawer._root.open()
   };
 
-  changeCategory = (c) => {
-    this.setState({ category: c })
+  changeCategory = async (c) => {
+    await this.setState({ category: c })
     this.fetch_data()
   }
 
