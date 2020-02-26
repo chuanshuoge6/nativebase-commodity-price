@@ -153,11 +153,11 @@ export default class App extends Component {
       case 6:
         await axios({
           method: 'get',
-          url: 'https://quotes.ino.com/charting/?s=FOREX_USDCNY',
+          url: 'https://api.exchangeratesapi.io/latest?symbols=USD,CNY',
         })
           .then(response => {
-            const soup = new JSSoup(response.data)
-            const rate = soup.find('p', 'quote-price').nextElement.toString()
+            const data = response.data.rates
+            const rate = data.CNY / data.USD
 
             this.setState({
               cny: ['USDCNY', 'CHINESE YUan', '', '', '', rate]
@@ -214,11 +214,10 @@ export default class App extends Component {
 
         await axios({
           method: 'get',
-          url: 'https://quotes.ino.com/charting/?s=FOREX_USDBTC',
+          url: 'https://api.coindesk.com/v1/bpi/currentprice.json',
         })
           .then(response => {
-            const soup = new JSSoup(response.data)
-            const rate = soup.find('p', 'quote-price').nextElement.toString()
+            const rate = parseFloat(response.data.bpi.USD.rate.replace(',', ''))
 
             this.setState({
               btc: ['BTCUSD', 'BIT COIN', '', '', '', rate]
