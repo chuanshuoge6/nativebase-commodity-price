@@ -10,7 +10,7 @@
   "dependencies": {
     "@mdi/js": "^4.8.95",
     "@mdi/react": "^1.2.1",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "expo": "~36.0.0",
     "expo-font": "~8.0.0",
     "jssoup": "0.0.10",
